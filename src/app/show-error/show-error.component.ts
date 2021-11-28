@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Input, OnInit, Optional} from '@angular/core';
-import {FormGroup, FormGroupDirective, NgForm} from '@angular/forms';
+import {FormGroup, FormGroupDirective, NgForm, ValidationErrors} from '@angular/forms';
 
 @Component({
   selector: 'pjm-show-error',
@@ -26,38 +26,30 @@ export class ShowErrorComponent implements OnInit {
   }
 
   get errorMessages(): string[] | null {
-
     const control = this.form.get(this.path);
-    const messages = [];
     if (!control || !(control.touched) || !control.errors) {
       return null;
     }
-    for (const code in control.errors) {
-      if (control.errors.hasOwnProperty(code)) {
-        const error = control.errors[code];
-        let message = '';
-        switch (code) {
-          case 'required':
-            message = `${this.displayName} ist ein Pflichtfeld`;
-            break;
-          case 'minlength':
-            message = `${this.displayName} muss mindestens ${error.requiredLength} Zeichen enthalten`;
-            break;
-          case 'maxlength':
-            message = `${this.displayName} darf maximal ${error.requiredLength} Zeichen enthalten`;
-            break;
-          case 'invalidEMail':
-            message = `Bitte geben Sie eine gültige E-Mail-Adresse an`;
-            break;
-          case 'userNotFound':
-            message = `Der eingetragene Benutzer existiert nicht.`;
-            break;
-          default:
-            message = `${name} ist nicht valide`;
-        }
-        messages.push(message);
+    control.status
+    return this.getDisplayMessages(control.errors);
+  }
+
+  private getDisplayMessages(errors: ValidationErrors): string[] {
+    return Object.entries(errors).map(([errorCode, error]) => {
+      switch (errorCode) {
+        case 'required':
+          return `${this.displayName} ist ein Pflichtfeld`;
+        case 'minlength':
+          return `${this.displayName} muss mindestens ${error.requiredLength} Zeichen enthalten`;
+        case 'maxlength':
+          return `${this.displayName} darf maximal ${error.requiredLength} Zeichen enthalten`;
+        case 'invalidEMail':
+          return `Bitte geben Sie eine gültige E-Mail-Adresse an`;
+        case 'userNotFound':
+          return `Der eingetragene Benutzer existiert nicht.`;
+        default:
+          return `${this.displayName} ist nicht valide`;
       }
-    }
-    return messages;
+    });
   }
 }

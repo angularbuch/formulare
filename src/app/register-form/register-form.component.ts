@@ -8,6 +8,7 @@ import { Component, OnInit } from '@angular/core';
 export class RegisterFormComponent implements OnInit {
 
   genderChoices = ['Herr', 'Frau'];
+  termsAgreed = false;
 
   user: any = {
   };

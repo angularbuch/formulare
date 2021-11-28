@@ -1,16 +1,11 @@
 import {Directive, forwardRef} from '@angular/core';
-import {
-  FormControl,
-  AbstractControl,
-  NG_VALIDATORS,
-  NG_ASYNC_VALIDATORS
-} from '@angular/forms';
+import {AbstractControl, NG_ASYNC_VALIDATORS, NG_VALIDATORS, ValidationErrors} from '@angular/forms';
 import {UserService} from '../services/user.service';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
-export function asyncIfNotBacklogThenAssignee(control: AbstractControl): Promise<any> {
-  const promise = new Promise((resolve, reject) => {
+export function asyncIfNotBacklogThenAssignee(control: AbstractControl): Promise<ValidationErrors | null> {
+  const promise = new Promise<ValidationErrors | null>((resolve, reject) => {
     setTimeout(() => {
       resolve(ifNotBacklogThanAssignee(control));
     }, 500);
@@ -18,7 +13,7 @@ export function asyncIfNotBacklogThenAssignee(control: AbstractControl): Promise
   return promise;
 }
 
-export function ifNotBacklogThanAssignee(formGroup: AbstractControl): {[key: string]: any} | null {
+export function ifNotBacklogThanAssignee(formGroup: AbstractControl): ValidationErrors | null {
   const nameControl = formGroup.get('assignee.name');
   const stateControl = formGroup.get('state');
   if (!nameControl || !stateControl) {
@@ -63,26 +58,26 @@ export class IfNotBacklogThanAssigneeValidatorDirective {
   }]
 })
 export class EmailValidatorDirective {
-  validate(control: AbstractControl): {[key: string]: any} | null {
-    const re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+  validate(control: AbstractControl): ValidationErrors | null {
+    const re = /^[A-Za-z0-9._%+-]+@mycompany.com$/i;
     if (!control.value || control.value === '' || re.test(control.value)) {
       return null;
     } else {
-      return {'invalidEMail': true};
+      return {invalidEMail: true};
     }
   }
 }
 
-export function emailValidator(control: AbstractControl): {[key: string]: any} | null {
+export function emailValidator(control: AbstractControl): ValidationErrors | null {
   return new EmailValidatorDirective().validate(control);
 }
 
-export function emailValidator2(control: AbstractControl): {[key: string]: any} | null {
-  const re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+export function emailValidator2(control: AbstractControl): ValidationErrors | null {
+  const re = /^[A-Za-z0-9._%+-]+@mycompany.com$/i;
   if (!control.value || control.value === '' || re.test(control.value)) {
     return null;
   } else {
-    return {'invalidEMail': true};
+    return {invalidEMail: true};
   }
 }
 
@@ -99,7 +94,7 @@ export class UserExistsValidatorDirective {
   constructor(private userService: UserService) {
   }
 
-  validate(control: AbstractControl): Observable<{[key: string]: any} | null> {
+  validate(control: AbstractControl): Observable<ValidationErrors | null> {
     console.log('Validating User');
     return this.userService.checkUserExists(control.value).pipe(
       map(userExists => !userExists ? {userNotFound: true} : null));

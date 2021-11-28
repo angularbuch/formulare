@@ -24,10 +24,7 @@ export class GeneratedFormComponent implements OnInit {
 
   }
   private createControl(question: Question): FormControl {
-    const validators = [];
-    if (question.required) {
-      validators.push(Validators.required);
-    }
+    const validators = question.required ? [Validators.required] : [];
     return new FormControl('', {validators: validators});
   }
 

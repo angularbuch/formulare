@@ -1,11 +1,20 @@
 import {Component} from '@angular/core';
-import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
 import * as model from '../models/model-interfaces';
 import {createInitialTask, Tag, Task} from '../models/model-interfaces';
 import {emailValidator, ifNotBacklogThanAssignee, UserExistsValidatorDirective} from '../models/custom-validators';
 import {TaskService} from '../services/task-service/task.service';
 import {UserService} from '../services/user.service';
 import {map} from 'rxjs/operators';
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'pjm-model-driven-form',
@@ -68,7 +77,7 @@ export class ReactiveFormComponent {
       assignee: new FormGroup({
         name: new FormControl('', {
           asyncValidators: this.userExistsValidatorReused,
-          updateOn: 'blur'
+          updateOn: 'blur',
         }),
         email: new FormControl('', {
           validators: emailValidator
@@ -93,7 +102,7 @@ export class ReactiveFormComponent {
     return false;
   }
 
-  saveTask(value: any) {
+  saveTask(value: Task) {
     console.log(value);
     Object.assign(this.task, value);
     this.taskService.saveTask(this.task);
@@ -117,7 +126,7 @@ export class ReactiveFormComponent {
     }
   }
 
-  userExistsValidator = (control: AbstractControl) => {
+  userExistsValidator = (control: AbstractControl): Observable<ValidationErrors | null> => {
     return this.userService.checkUserExists(control.value).pipe(
       map(checkResult => {
         return (checkResult === false) ? {userNotFound: true} : null;

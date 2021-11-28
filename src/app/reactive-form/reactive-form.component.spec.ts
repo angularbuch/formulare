@@ -51,19 +51,5 @@ describe('Reactive Form', () => {
 
   }));
 
-  it('should be able to work with Observable.delay', fakeAsync(() => {
-    const actuallyDone=false;
-    const source = Observable.of(true).delay(10);
-    source.subscribe(
-      val => {
-        actuallyDone = true;
-      },
-      err => fail(err)
-    );
-    tick(100);
-    expect(actuallyDone).toBeTruthy(); // Expected false to be truthy.
-
-    discardPeriodicTasks();
-  }));
 */
   );

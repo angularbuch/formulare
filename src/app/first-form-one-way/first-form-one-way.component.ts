@@ -1,11 +1,16 @@
 import {Component} from '@angular/core';
 
+interface Task {
+  title: string;
+  description: string;
+}
+
 @Component({
   selector: 'pjm-first-form-one-way',
   templateUrl: 'first-form-one-way.component.html',
 })
 export class FirstFormOneWayComponent {
-  task: any;
+  task: Task ;
 
   constructor() {
     this.task = {
@@ -14,7 +19,7 @@ export class FirstFormOneWayComponent {
     };
   }
 
-  saveTask(value: any) {
+  saveTask(value: Task) {
     this.task = value;
   }
 }

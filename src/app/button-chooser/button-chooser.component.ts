@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Choice, Question} from './models/question';
+import {Component, EventEmitter, HostBinding, HostListener, Input, Output} from '@angular/core';
+import {Choice, Question} from '../models/question';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
 @Component({
@@ -14,22 +14,33 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
     }]
 })
 export class ButtonChooserComponent implements ControlValueAccessor  {
-  @Input() choices!: string[];
+  @Input() choices?: string[];
 
-  value: any;
-  private propagateChange = Function.prototype;
-  private propagateTouched = Function.prototype;
+  value?: string;
+  isDisabled = false;
+  propagateChange!: (value: any) => void;
+  propagateTouched!: () => void;
+
+  onBlur(isLast: boolean) {
+    if (isLast) {
+      this.propagateTouched();
+    }
+  }
 
   public writeValue(value: any) {
       this.value = value;
   }
 
-  public registerOnChange(fn: any) {
+  public registerOnChange(fn: (value: any) => void) {
     this.propagateChange = fn;
   }
 
-  public registerOnTouched(fn: any) {
+  public registerOnTouched(fn: () => void) {
     this.propagateTouched = fn;
+  }
+
+  setDisabledState(disabled: boolean) {
+    this.isDisabled = disabled;
   }
 
   changeValue(value: string) {

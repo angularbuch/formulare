@@ -1,9 +1,9 @@
 import {Component, Input} from '@angular/core';
-import {FormGroup, NgForm} from '@angular/forms';
+import {FormGroup, NgForm, ValidationErrors} from '@angular/forms';
 
 
 @Component({
-  selector: 'pjm-show-error',
+  selector: 'pjm-show-error-template-driven',
   template: `
     <div *ngIf="errorMessages" class="alert alert-danger">
       <div *ngFor="let errorMessage of errorMessages">
@@ -11,7 +11,7 @@ import {FormGroup, NgForm} from '@angular/forms';
       </div>
     </div>`
 })
-export class ShowErrorComponent {
+export class ShowErrorComponentTemplateDriven {
   @Input('path') controlPath = '';
   @Input('text') displayName = '';
 
@@ -19,38 +19,30 @@ export class ShowErrorComponent {
   }
 
   get errorMessages(): string[] | null {
-    const messages = [];
     const form: FormGroup = this.ngForm.form;
     const control = form.get(this.controlPath);
     if (!control || !(control.touched) || !control.errors) {
       return null;
     }
-    for (const code in control.errors) {
-      if (control.errors.hasOwnProperty(code)) {
-        const error = control.errors[code];
-        let message = '';
-        switch (code) {
-          case 'required':
-            message = `${this.displayName} ist ein Pflichtfeld`;
-            break;
-          case 'minlength':
-            message = `${this.displayName} muss mindestens ${error.requiredLength} Zeichen enthalten`;
-            break;
-          case 'maxlength':
-            message = `${this.displayName} darf maximal ${error.requiredLength} Zeichen enthalten`;
-            break;
-          case 'invalidEMail':
-            message = `Bitte geben Sie eine gültige E-Mail Adresse an`;
-            break;
-          case 'userNotFound':
-            message = `Der eingetragene Benutzer existiert nicht.`;
-            break;
-          default:
-            message = `${name} ist nicht valide`;
-        }
-        messages.push(message);
+    return this.getDisplayMessages(control.errors);
+  }
+
+  private getDisplayMessages(errors: ValidationErrors): string[] {
+    return Object.entries(errors).map(([errorCode, error]) => {
+      switch (errorCode) {
+        case 'required':
+          return `${this.displayName} ist ein Pflichtfeld`;
+        case 'minlength':
+          return `${this.displayName} muss mindestens ${error.requiredLength} Zeichen enthalten`;
+        case 'maxlength':
+          return `${this.displayName} darf maximal ${error.requiredLength} Zeichen enthalten`;
+        case 'invalidEMail':
+          return `Bitte geben Sie eine gültige E-Mail Adresse an`;
+        case 'userNotFound':
+          return `Der eingetragene Benutzer existiert nicht.`;
+        default:
+          return `${this.displayName} ist nicht valide`;
       }
-    }
-    return messages;
+    });
   }
 }
