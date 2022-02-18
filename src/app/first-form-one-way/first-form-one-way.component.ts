@@ -15,7 +15,7 @@ export class FirstFormOneWayComponent {
   constructor() {
     this.task = {
       title: 'Neues Entwickler-Team zusammenstellen',
-      description: 'Notwendige Kenntnisse Angular 2 & TypeScript'
+      description: 'Notwendige Kenntnisse Angular & TypeScript',
     };
   }
 
